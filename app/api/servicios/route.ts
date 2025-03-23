@@ -50,3 +50,49 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const {
+      id,
+      plataforma,
+      status,
+      precio_vender,
+      precio_comprar,
+      num_proveedor,
+      empresa_proveedor,
+      fecha_fin,
+      fecha_inicio,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "El campo ID es obligatorio" },
+        { status: 400 }
+      );
+    }
+
+    const updatedServicio = await prisma.servicio.update({
+      where: { id: Number(id) },
+      data: {
+        plataforma,
+        status: parseInt(status),
+        precio_vender,
+        precio_comprar,
+        num_proveedor,
+        empresa_proveedor,
+        fecha_fin: new Date(fecha_fin),
+        fecha_inicio: new Date(fecha_inicio),
+      },
+    });
+
+    return NextResponse.json(updatedServicio, { status: 200 });
+  } catch (error) {
+    console.error("Error al actualizar el servicio:", error);
+    return NextResponse.json(
+      { error: "Error al actualizar el servicio" },
+      { status: 500 }
+    );
+  }
+}

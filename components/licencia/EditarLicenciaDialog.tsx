@@ -73,18 +73,21 @@ export function EditarLicenciaDialog({
         console.error("Error al cargar usuarios/servicios:", error);
       }
     };
+
     fetchData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/licencias/${licencia.id}`, {
+      // Usamos el endpoint fijo "/api/licencias" y enviamos el id en el body
+      const response = await fetch(`/api/licencias`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          id: licencia.id,
           user_id,
           servicio_id,
           status,

@@ -36,12 +36,13 @@ export function EditarUsuarioDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/usuarios/${usuario.id}`, {
+      const response = await fetch(`/api/usuarios`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          id: usuario.id, // se envía el ID en el body
           telefono,
           status,
           observacion,
@@ -56,7 +57,6 @@ export function EditarUsuarioDialog({
       toast.success("Usuario actualizado exitosamente");
     } catch (error) {
       console.error("Error:", error);
-
       toast.error("Hubo un error al actualizar el usuario");
     }
   };
@@ -85,7 +85,9 @@ export function EditarUsuarioDialog({
           <div className="mb-4">
             <Label className="mb-3">Status</Label>
             <select
-              className={`border rounded px-2 py-1 ${status === 1 ? 'text-green-600' : 'text-red-600'}`}
+              className={`border rounded px-2 py-1 ${
+                status === 1 ? "text-green-600" : "text-red-600"
+              }`}
               value={status}
               onChange={(e) => {
                 setStatus(parseInt(e.target.value, 10));

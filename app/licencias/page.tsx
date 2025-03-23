@@ -79,12 +79,14 @@ export default function LicenciasPage() {
       const nuevaFechaFin = new Date(licencia.fin);
       nuevaFechaFin.setMonth(nuevaFechaFin.getMonth() + 1);
 
-      const response = await fetch(`/api/licencias/${licencia.id}`, {
+      // Cambia la ruta para llamar al endpoint fijo
+      const response = await fetch(`/api/licencias`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          id: licencia.id,
           inicio: nuevaFechaInicio.toISOString(),
           fin: nuevaFechaFin.toISOString(),
         }),
@@ -102,7 +104,7 @@ export default function LicenciasPage() {
         },
         body: JSON.stringify({
           licencia_id: licencia.id,
-          detalles: `RENOVACIÓN LICENCIA  `,
+          detalles: `RENOVACIÓN LICENCIA`,
           monto_ingreso: selectedServicio.precio_vender,
         }),
       });
