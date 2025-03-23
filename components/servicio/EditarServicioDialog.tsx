@@ -18,11 +18,11 @@ interface EditarServicioDialogProps {
   servicio: {
     id: number;
     plataforma: string;
-    precio_vender: string;
+    precio_vender: number;
     precio_comprar: number;
-    num_proveedor: string;
+    num_proveedor: number; // Considera cambiar a string si así es el modelo
     empresa_proveedor: string;
-    fecha_inicio : string;
+    fecha_inicio: string;
     fecha_fin: string;
     status: number | string;
   };
@@ -36,41 +36,52 @@ export function EditarServicioDialog({
   const [plataforma, setPlataforma] = useState(servicio.plataforma);
   const [precioVender, setPrecioVender] = useState(servicio.precio_vender);
   const [precioComprar, setPrecioComprar] = useState(servicio.precio_comprar);
-  const [numProveedor, setNumProveedor] = useState(servicio.num_proveedor);
-  const [empresaProveedor, setEmpresaProveedor] = useState(servicio.empresa_proveedor);
+  // Convertir numProveedor a string para que coincida con el modelo Prisma
+  const [numProveedor, setNumProveedor] = useState(
+    servicio.num_proveedor.toString()
+  );
+  const [empresaProveedor, setEmpresaProveedor] = useState(
+    servicio.empresa_proveedor
+  );
   const [fecha_inicio, setfecha_inicio] = useState(servicio.fecha_inicio);
   const [fecha_fin, setfecha_fin] = useState(servicio.fecha_fin);
   const [status, setStatus] = useState<number | string>(servicio.status);
   const [isOpen, setIsOpen] = useState(false);
 
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return !isNaN(date.getTime()) ? date.toISOString().substring(0, 10) : "";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/servicios/${servicio.id}`, {
+      const response = await fetch(`/api/servicios`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          id: servicio.id,
           plataforma,
           precio_comprar: precioComprar,
           precio_vender: precioVender,
-          num_proveedor: numProveedor,
+          num_proveedor: String(numProveedor), // Enviar como string
           empresa_proveedor: empresaProveedor,
-          fecha_fin: fecha_fin,
-          fecha_inicio: fecha_inicio,
+          fecha_fin,
+          fecha_inicio,
           status,
         }),
       });
       if (!response.ok) {
-        throw new Error("Error al actualizar el servicio");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al actualizar el servicio");
       }
       fetchServicios();
       setIsOpen(false);
-
       toast.success("Servicio actualizado exitosamente");
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (error: any) {
+      console.error("Error:", error.message);
       toast.error("Hubo un error al actualizar el servicio");
     }
   };
@@ -102,7 +113,7 @@ export function EditarServicioDialog({
             <Input
               type="text"
               value={precioVender}
-              onChange={(e) => setPrecioVender(e.target.value)}
+              onChange={(e) => setPrecioVender(Number(e.target.value))}
               required
             />
           </div>
@@ -122,7 +133,7 @@ export function EditarServicioDialog({
             <Input
               type="text"
               value={numProveedor}
-              onChange={(e) => setNumProveedor((e.target.value))}
+              onChange={(e) => setNumProveedor(e.target.value)}
               required
             />
           </div>
@@ -131,20 +142,16 @@ export function EditarServicioDialog({
             <Input
               type="text"
               value={empresaProveedor}
-              onChange={(e) => setEmpresaProveedor((e.target.value))}
+              onChange={(e) => setEmpresaProveedor(e.target.value)}
               required
             />
           </div>
 
           <div className="mb-4">
-            <Label className="mb-3">Fecha de fecha inicio</Label>
+            <Label className="mb-3">Fecha de inicio</Label>
             <Input
               type="date"
-              value={
-                fecha_inicio
-                  ? new Date(fecha_inicio).toISOString().substring(0, 10)
-                  : ""
-              }
+              value={formatDate(fecha_inicio)}
               onChange={(e) => setfecha_inicio(e.target.value)}
               required
             />
@@ -154,11 +161,7 @@ export function EditarServicioDialog({
             <Label className="mb-3">Fecha de fin</Label>
             <Input
               type="date"
-              value={
-                fecha_fin
-                  ? new Date(fecha_fin).toISOString().substring(0, 10)
-                  : ""
-              }
+              value={formatDate(fecha_fin)}
               onChange={(e) => setfecha_fin(e.target.value)}
               required
             />
@@ -166,15 +169,15 @@ export function EditarServicioDialog({
 
           <div className="mb-4">
             <Label className="mb-3">Status</Label>
-            <Input
-              type="number"
+            <select
+              className="border rounded px-2 py-1"
               value={status}
-              onChange={(e) => {
-                const value = parseInt(e.target.value, 10);
-                setStatus(isNaN(value) ? 1 : value);
-              }}
+              onChange={(e) => setStatus(parseInt(e.target.value, 10))}
               required
-            />
+            >
+              <option value={1}>Activo</option>
+              <option value={0}>Inactivo</option>
+            </select>
           </div>
 
           <Button type="submit">Guardar Cambios</Button>

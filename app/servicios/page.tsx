@@ -49,7 +49,7 @@ export default function ServiciosPage() {
               <TableHead>Precio a vender</TableHead>
               <TableHead>Precio a comprar</TableHead>
               <TableHead>Proveedor</TableHead>
-              
+              <TableHead>Empresa proveedora</TableHead>
               <TableHead>Fecha inicio</TableHead>
               <TableHead>Fecha fin</TableHead>
               <TableHead>Status</TableHead>
@@ -88,10 +88,10 @@ export default function ServiciosPage() {
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    {/* <EditarServicioDialog
+                    <EditarServicioDialog
                       servicio={servicio}
                       fetchServicios={fetchServicios}
-                    /> */}
+                    />
                     <ConfirmarEliminacionDialog
                       servicioId={servicio.id}
                       fetchServicios={fetchServicios}
