@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model licencia {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  servicio_id Int
+  status      Int
+  correo      String
+  contraseña  String
+  inicio      DateTime @db.DateTime(0)
+  fin         DateTime @db.DateTime(0)
+  usuario     usuario  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "licencia_ibfk_1")
+  servicio    servicio @relation(fields: [servicio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "licencia_ibfk_2")
+  ingresos    ingreso[]
+
+  @@index([servicio_id], map: "servicio_id")
+  @@index([user_id], map: "user_id")
+}
+
+model servicio {
+  id             Int        @id @default(autoincrement())
+  plataforma     String
+  status         Int
+  precio_vender  Decimal    @db.Decimal(10, 2)
+  precio_comprar Decimal    @db.Decimal(10, 2)
+  num_proveedor  String
+  empresa_proveedor  String
+  fecha_inicio   DateTime
+  fecha_fin      DateTime
+  licencia       licencia[]
+  egresos        egreso[]
+}
+
+model usuario {
+  id          Int        @id @default(autoincrement())
+  telefono    String
+  status      Int
+  observacion String
+  licencia    licencia[]
+}
+
+model ingreso {
+  id          Int      @id @default(autoincrement())
+  licencia_id Int
+  detalles   String
+  monto_ingreso Decimal @db.Decimal(10, 2)
+
+
+  licencia licencia @relation(fields: [licencia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ingreso_ibfk_1")
+
+}
+
+  model egreso {
+    id          Int      @id @default(autoincrement())
+    servicio_id Int
+    detalles    String
+    monto_egreso Decimal @db.Decimal(10, 2)
+
+    servicio servicio @relation(fields: [servicio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "egreso_ibfk_1")
+  }
